@@ -204,14 +204,32 @@ function Exchange(purchase) {
  * @transaction
  */
 function ResolveForRefund(purchase) {
-  	
+    if (purchase.order.status != "Dispute"){
+        throw new Error("object is not Disputed");
+    }
+        purchase.order.status = "ToRefund";
+        purchase.order.disputeResolved = new Date().toISOString();
+    return getAssetRegistry('org.acme.sintegralabsbc.Order')
+        .then(function (assetRegistry) {
+            return assetRegistry.update(purchase.order);
+        });	
   }
 /**
  * @param {org.acme.sintegralabsbc.Refund} purchase - the order to be processed
  * @transaction
  */
 function Refund(purchase) {
-      
+    if (purchase.order.status != "ToRefund"){
+        throw new Error("object is not ToRefund");
+    }
+        purchase.order.financeco.balance += purchase.order.amount;
+        purchase.order.seller.balance -= purchase.order.amount;
+        purchase.order.status = "Refund";
+        purchase.order.refundDate = new Date().toISOString();
+    return getAssetRegistry('org.acme.sintegralabsbc.Order')
+        .then(function (assetRegistry) {
+            return assetRegistry.update(purchase.order);
+        });    
 }
  /**
  * Record a request for refund by the buyer
@@ -219,6 +237,15 @@ function Refund(purchase) {
  * @transaction
  */
 function RequestRefund(purchase) {
+    if (purchase.order.status != "Refund"){
+        throw new Error("object is not Refund");
+    }
+        purchase.order.status = "Redund_Request";
+        purchase.order.refundRequestedDate = new Date().toISOString();
+    return getAssetRegistry('org.acme.sintegralabsbc.Order')
+        .then(function (assetRegistry) {
+            return assetRegistry.update(purchase.order);
+        });
    
 }
  /**
@@ -227,7 +254,17 @@ function RequestRefund(purchase) {
  * @transaction
  */
 function GetRefund(purchase) {
-    
+    if (purchase.order.status != "Refund_Requested"){
+        throw new Error("object is not Refund Requested");
+    }
+        purchase.order.financeco.balance -= purchase.order.amount;
+        purchase.order.buyer.balance += purchase.order.amount;
+        purchase.order.status = "Refund";
+        purchase.order.refundDate = new Date().toISOString();
+    return getAssetRegistry('org.acme.sintegralabsbc.Order')
+        .then(function (assetRegistry) {
+            return assetRegistry.update(purchase.order);
+        });
 }
 /**
  * Decline a buyer dispute
