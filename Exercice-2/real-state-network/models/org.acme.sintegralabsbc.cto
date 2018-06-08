@@ -42,7 +42,8 @@ asset Order identified by orderNumber {
     o String createdDate
     o String orderedDate
     o String paymentRequestedDate
-    
+    o String createdContractDate
+    o String breakContractDate
     o String paidDate    
     --> Buyer buyer
     --> Seller seller
@@ -53,8 +54,10 @@ enum Status{
   o Order_Created
   o Purchased
   o Rented
+  o Break_Contract
   o Payment_Requested
   o Contract_Requested
+  o Break_Contract_Requested
   o Rented_Requested
   o Paid
 }
@@ -93,6 +96,16 @@ transaction ContractRequested {
 }
 transaction RentedRequested {
     o Integer amount
+    --> Order order
+    --> Buyer buyer
+    --> Seller seller
+}
+transaction Break {
+    --> Order order
+    --> Buyer buyer
+    --> Seller seller
+}
+transaction BreakRequested {
     --> Order order
     --> Buyer buyer
     --> Seller seller
