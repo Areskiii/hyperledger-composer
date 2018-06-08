@@ -166,3 +166,29 @@ return getAssetRegistry('org.acme.sintegralabsbc.Order')
         return assetRegistry.update(purchase.order);
     });
 }
+
+function PayRented(purchase) {
+    
+    if (purchase.order.status != "Payment_Requested"){
+    	throw new Error("your payment is not requested");
+    } 
+    purchase.order.financeco.balance -= purchase.order.amount;
+    purchase.order.financeco.balance -= purchase.order.guarantee;
+    purchase.order.seller.balance += purchase.order.amount;
+    purchase.order.seller.balance += purchase.order.guarantee;
+    purchase.order.status = "Paid";
+    purchase.order.paidDate = new Date().toISOString();
+    
+    return getAssetRegistry('org.acme.sintegralabsbc.Order')
+        .then(function (assetRegistry) {
+            return assetRegistry.update(purchase.order);
+        }).then(function () {
+            return getParticipantRegistry('org.acme.sintegralabsbc.FinanceCo')
+        }).then (function (financeCoRegistry) {
+            return financeCoRegistry.update(purchase.order.financeco);
+        }).then(function () {
+            return getParticipantRegistry('org.acme.sintegralabsbc.Seller')
+        }).then (function (sellerCoRegistry) {
+            return sellerCoRegistry.update(purchase.order.seller);
+        });
+}
