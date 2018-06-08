@@ -136,3 +136,33 @@ function ContractRequested(purchase) {
             return assetRegistry.update(purchase.order);
         });
 }
+
+function BreakRequested(purchase) {
+    
+    if (purchase.order.status != "Break_Contract_Requested"){
+    	throw new Error("your order is not purchased");
+    } 
+
+    purchase.order.status = "Payment_Requested";
+    purchase.order.paymentRequestedDate = new Date().toISOString();
+    
+    return getAssetRegistry('org.acme.sintegralabsbc.Order')
+        .then(function (assetRegistry) {
+            return assetRegistry.update(purchase.order);
+        });
+}
+/**
+ * @param {org.acme.sintegralabsbc.Exchange} purchase - the order to be processed
+ * @transaction
+ */
+function Exchange(purchase) {
+    if (purchase.order.status != "ToExchange"){
+    throw new Error("object is not for Exchange");
+    }
+    purchase.order.status = "Exchange";
+    purchase.order.exchangeDate = new Date().toISOString();
+return getAssetRegistry('org.acme.sintegralabsbc.Order')
+    .then(function (assetRegistry) {
+        return assetRegistry.update(purchase.order);
+    });
+}

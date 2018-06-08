@@ -42,6 +42,7 @@ asset Order identified by orderNumber {
     o String createdDate
     o String orderedDate
     o String paymentRequestedDate
+    o String exchangeDate
     o String createdContractDate
     o String breakContractDate
     o String paidDate    
@@ -106,6 +107,11 @@ transaction Break {
     --> Seller seller
 }
 transaction BreakRequested {
+    --> Order order
+    --> Buyer buyer
+    --> Seller seller
+}
+  transaction Exchange {
     --> Order order
     --> Buyer buyer
     --> Seller seller
