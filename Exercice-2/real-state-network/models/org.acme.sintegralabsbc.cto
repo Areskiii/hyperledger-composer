@@ -83,6 +83,11 @@ transaction CreateOrder {
     --> Seller seller
     --> FinanceCo financeCo
 }
+transaction PayRented {
+    --> Order order
+    --> Seller seller
+    --> FinanceCo financeCo
+}
 transaction Rented {
   o Integer guarantee
     --> Order order
